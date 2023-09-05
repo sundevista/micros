@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRepository } from './users.repository';
 import { User } from './schemas/user.schema';
@@ -87,5 +91,16 @@ export class UsersService {
         password: requestPasswordResetDto.password,
       });
     }
+  }
+
+  async validateUser(email: string, password: string) {
+    const user = await this.usersRepository.findOne({ email });
+    const passwordsMatch = bcrypt.compare(password, user.password);
+
+    if (!passwordsMatch) {
+      throw new UnauthorizedException();
+    }
+
+    return user;
   }
 }
