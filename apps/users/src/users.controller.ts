@@ -54,7 +54,7 @@ export class UsersController {
   @Post('forgot-password')
   async forgotPassword(
     @Body() forgotPasswordRequestDto: ForgotPasswordRequestDto,
-  ): Promise<void> {
+  ): Promise<any> {
     return this.usersService.forgotPassword(forgotPasswordRequestDto);
   }
 

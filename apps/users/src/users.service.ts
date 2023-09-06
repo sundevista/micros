@@ -1,5 +1,7 @@
 import {
+  Inject,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,14 +14,18 @@ import { PASSWORD_SALT_ROUNDS } from './users.constants';
 import { EncryptionService } from '@app/common/encryption/encryption.service';
 import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { catchError, of, tap } from 'rxjs';
 
 @Injectable()
 export class UsersService {
   private readonly passwordRestoration: Record<string, string> = {};
+  private readonly logger = new Logger(UsersService.name);
 
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly encryptionService: EncryptionService,
+    @Inject('MAIL') private readonly mailClient: ClientProxy,
   ) {}
 
   async hashedPassword(password: string): Promise<string> {
@@ -76,9 +82,25 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    this.passwordRestoration[this.encryptionService.generateToken()] =
-      user._id.toString();
-    // TODO: Setup mailer
+    const token = this.encryptionService.generateToken();
+    this.passwordRestoration[token] = user._id.toString();
+
+    return this.mailClient
+      .send('send-forgot-mail', { recepient: user.email, token })
+      .pipe(
+        tap(() => {
+          this.logger.log('Email was successfully sent');
+          return of('Email was successfully sent');
+        }),
+        catchError((err) => {
+          this.logger.warn(
+            `Failed to send reset token to ${
+              user.email
+            }. Details: ${JSON.stringify(err)}`,
+          );
+          return of('Failed to send mail');
+        }),
+      );
   }
 
   async resetPassword(requestPasswordResetDto: RequestPasswordResetDto) {

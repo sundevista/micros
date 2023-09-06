@@ -47,9 +47,10 @@ services:
       - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=$MONGODB_ROOT_PASSWORD
       - MONGODB_REPLICA_SET_KEY=$MONGODB_REPLICA_SET_KEY
   rabbitmq:
-    image: rabbitmq
+    image: rabbitmq:management
     ports:
       - '5672:5672'
+      - '15671:15672'
 
 volumes:
   mongodb_master_data:
