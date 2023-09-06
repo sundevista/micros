@@ -14,6 +14,7 @@ import { RmqModule } from '../../../libs/common/src';
         EMAIL_SERVICE: Joi.string().required(),
         EMAIL_USER: Joi.string().required(),
         EMAIL_PASSWORD: Joi.string().required(),
+        EMAIL_RESET_URL: Joi.string().required(),
       }),
     }),
     RmqModule,

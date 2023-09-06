@@ -2,6 +2,7 @@ import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createTransport } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
+import { defaultResetMailTemplate } from './templates/default-reset-mail.template';
 
 @Injectable()
 export class MailerService {
@@ -37,8 +38,13 @@ export class MailerService {
     this.nodemailerTransport.sendMail(
       {
         to: recepient,
-        subject: 'Forgot password request',
-        text: `Visit https://app.com/restore-pass?token=${token} to reset your password`,
+        subject: `Password reset request ${this.configService.get<string>(
+          'EMAIL_RESET_URL',
+        )}`,
+        html: defaultResetMailTemplate(
+          this.configService.get<string>('EMAIL_RESET_URL'),
+          token,
+        ),
       },
       (err, info) => {
         this.logger.warn(
