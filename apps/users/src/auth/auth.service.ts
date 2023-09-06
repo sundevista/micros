@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { User } from '../schemas/user.schema';
+import { authenticationCookieKey } from '../../../../libs/common/src';
 
 export interface TokenPayload {
   userId: string;
@@ -27,15 +28,15 @@ export class AuthService {
 
     const token = this.jwtService.sign(tokenPayload);
 
-    response.cookie('__Host-Authentication', token, {
+    response.cookie(authenticationCookieKey, token, {
       httpOnly: true,
       secure: true,
       expires,
     });
   }
 
-  logout(response: Response) {
-    response.cookie('__Host-Authentication', '', {
+  async logout(response: Response) {
+    response.cookie(authenticationCookieKey, '', {
       httpOnly: true,
       secure: true,
       expires: new Date(),

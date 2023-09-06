@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable, catchError, tap } from 'rxjs';
+import { authenticationCookieKey } from './shared-auth.constants';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -17,7 +18,7 @@ export class JwtAuthGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const authentication = this.getAuthentication(context);
     return this.authClient
-      .send('validate_user', { '__Host-Authentication': authentication })
+      .send('validate_user', { [authenticationCookieKey]: authentication })
       .pipe(
         tap((res) => {
           this.addUser(res, context);
@@ -31,10 +32,10 @@ export class JwtAuthGuard implements CanActivate {
   private getAuthentication(context: ExecutionContext) {
     let authentication: string;
     if (context.getType() === 'rpc') {
-      authentication = context.switchToRpc().getData()['__Host-Authentication'];
+      authentication = context.switchToRpc().getData()[authenticationCookieKey];
     } else if (context.getType() === 'http') {
       authentication = context.switchToHttp().getRequest().cookies[
-        '__Host-Authentication'
+        authenticationCookieKey
       ];
     }
 

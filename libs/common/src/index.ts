@@ -5,6 +5,6 @@ export * from './encryption/encryption.module';
 export * from './encryption/encryption.service';
 export * from './rmq/rmq.module';
 export * from './rmq/rmq.service';
-export * from './auth/auth.constants';
 export * from './auth/shared-auth.module';
+export * from './auth/shared-auth.constants';
 export * from './auth/jwt-auth.guard';
