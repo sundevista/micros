@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { MailerService } from './mailer.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { send_forgot_mail } from '../../../libs/common/src';
+import { SendForgotMailDto } from './dto/send-forgot-mail.dto';
 
 @Controller()
 export class MailerController {
@@ -9,11 +10,8 @@ export class MailerController {
 
   @MessagePattern(send_forgot_mail)
   async sendForgotMail(
-    @Payload() data: { recepient: string; token: string },
+    @Payload() { token, recepient }: SendForgotMailDto,
   ): Promise<boolean> {
-    return this.mailerService.sendForgotPasswordMail(
-      data.token,
-      data.recepient,
-    );
+    return this.mailerService.sendForgotPasswordMail(token, recepient);
   }
 }
