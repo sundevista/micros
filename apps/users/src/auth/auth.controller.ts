@@ -21,6 +21,14 @@ export class AuthController {
     response.send(user);
   }
 
+  @Post('logout')
+  async logout(
+    @CurrentUser() user: User,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    await this.authService.logout(response);
+  }
+
   @UseGuards(JwtAuthGuard)
   @MessagePattern('validate_user')
   async validateUser(@CurrentUser() user: User) {
