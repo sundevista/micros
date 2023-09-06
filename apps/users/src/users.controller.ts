@@ -15,28 +15,29 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
 import { CurrentUser } from './auth/current-user.decorator';
-import { JwtAuthGuard } from '@app/common';
+import { JwtAuthGuard, ProxySafeThrottlerGuard } from '@app/common';
 import MongooseClassSerializerInterceptor from './interceptors/mongoose-class-serializer.interceptor';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(ProxySafeThrottlerGuard)
   @UseInterceptors(MongooseClassSerializerInterceptor(User))
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(createUserDto);
   }
 
+  @UseGuards(ProxySafeThrottlerGuard, JwtAuthGuard)
   @UseInterceptors(MongooseClassSerializerInterceptor(User))
-  @UseGuards(JwtAuthGuard)
   @Get()
   async findUser(@CurrentUser() user: User): Promise<User> {
     return this.usersService.findOneById(user._id.toString());
   }
 
   @UseInterceptors(MongooseClassSerializerInterceptor(User))
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ProxySafeThrottlerGuard, JwtAuthGuard)
   @Patch()
   async updateUser(
     @CurrentUser() user: User,
@@ -51,6 +52,7 @@ export class UsersController {
     return this.usersService.delete(user._id.toString());
   }
 
+  @UseGuards(ProxySafeThrottlerGuard)
   @Post('forgot-password')
   async forgotPassword(
     @Body() forgotPasswordRequestDto: ForgotPasswordRequestDto,
@@ -58,6 +60,7 @@ export class UsersController {
     return this.usersService.forgotPassword(forgotPasswordRequestDto);
   }
 
+  @UseGuards(ProxySafeThrottlerGuard)
   @Post('reset-password')
   async resetPassword(
     @Body() requestPasswordResetDto: RequestPasswordResetDto,

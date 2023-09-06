@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import {
   DatabaseModule,
+  RateLimiterModule,
   RmqModule,
   SharedAuthModule,
   authClientKey,
@@ -32,10 +33,11 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     EncryptionModule,
-    RmqModule.register({ name: mailClientKey }),
-    RmqModule.register({ name: authClientKey }),
+    RmqModule.registerClient({ name: mailClientKey }),
+    RmqModule.registerClient({ name: authClientKey }),
     forwardRef(() => AuthModule),
     SharedAuthModule,
+    RateLimiterModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository, EncryptionService],

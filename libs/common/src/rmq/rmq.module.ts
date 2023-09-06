@@ -12,7 +12,7 @@ interface RmqModuleOptions {
   exports: [RmqService],
 })
 export class RmqModule {
-  static register({ name }: RmqModuleOptions): DynamicModule {
+  static registerClient({ name }: RmqModuleOptions): DynamicModule {
     return {
       module: RmqModule,
       imports: [

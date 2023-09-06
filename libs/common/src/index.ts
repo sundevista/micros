@@ -9,3 +9,5 @@ export * from './rmq/rmq.constants';
 export * from './auth/shared-auth.module';
 export * from './auth/shared-auth.constants';
 export * from './auth/jwt-auth.guard';
+export * from './rate-limiter/rate-limiter.module';
+export * from './rate-limiter/proxy-safe-throttler.guard';
