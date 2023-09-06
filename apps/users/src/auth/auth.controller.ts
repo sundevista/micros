@@ -6,6 +6,7 @@ import { CurrentUser } from './current-user.decorator';
 import JwtAuthGuard from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { User } from '../schemas/user.schema';
+import { validate_user } from '../../../../libs/common/src';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +31,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @MessagePattern('validate_user')
+  @MessagePattern(validate_user)
   async validateUser(@CurrentUser() user: User) {
     return user;
   }

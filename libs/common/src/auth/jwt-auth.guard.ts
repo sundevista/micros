@@ -8,17 +8,20 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable, catchError, tap } from 'rxjs';
 import { authenticationCookieKey } from './shared-auth.constants';
+import { authClientKey, validate_user } from '../rmq/rmq.constants';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(@Inject('AUTH') private readonly authClient: ClientProxy) {}
+  constructor(
+    @Inject(authClientKey) private readonly authClient: ClientProxy,
+  ) {}
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const authentication = this.getAuthentication(context);
     return this.authClient
-      .send('validate_user', { [authenticationCookieKey]: authentication })
+      .send(validate_user, { [authenticationCookieKey]: authentication })
       .pipe(
         tap((res) => {
           this.addUser(res, context);

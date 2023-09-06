@@ -3,7 +3,13 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { DatabaseModule, RmqModule, SharedAuthModule } from '@app/common';
+import {
+  DatabaseModule,
+  RmqModule,
+  SharedAuthModule,
+  authClientKey,
+  mailClientKey,
+} from '@app/common';
 import { UsersRepository } from './users.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
@@ -26,8 +32,8 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     EncryptionModule,
-    RmqModule.register({ name: 'MAIL' }),
-    RmqModule.register({ name: 'AUTH' }),
+    RmqModule.register({ name: mailClientKey }),
+    RmqModule.register({ name: authClientKey }),
     forwardRef(() => AuthModule),
     SharedAuthModule,
   ],

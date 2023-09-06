@@ -4,12 +4,13 @@ import {
   Type,
 } from '@nestjs/common';
 import { ClassTransformOptions, plainToClass } from 'class-transformer';
+import { Document } from 'mongoose';
 
 export default function MongooseClassSerializerInterceptor(
   classToIntercept: Type,
 ): typeof ClassSerializerInterceptor {
   return class Interceptor extends ClassSerializerInterceptor {
-    private changePlainObjectToClass(document: any) {
+    private changePlainObjectToClass(document: object | Document) {
       return plainToClass(classToIntercept, document);
     }
 

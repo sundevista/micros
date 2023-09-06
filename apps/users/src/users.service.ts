@@ -16,6 +16,7 @@ import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, of, tap } from 'rxjs';
+import { mailClientKey, send_forgot_mail } from '../../../libs/common/src';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +26,7 @@ export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly encryptionService: EncryptionService,
-    @Inject('MAIL') private readonly mailClient: ClientProxy,
+    @Inject(mailClientKey) private readonly mailClient: ClientProxy,
   ) {}
 
   async hashedPassword(password: string): Promise<string> {
@@ -86,7 +87,7 @@ export class UsersService {
     this.passwordRestoration[token] = user._id.toString();
 
     return this.mailClient
-      .send('send-forgot-mail', { recepient: user.email, token })
+      .send(send_forgot_mail, { recepient: user.email, token })
       .pipe(
         tap(() => {
           this.logger.log('Email was successfully sent');
