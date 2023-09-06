@@ -1,1 +1,5 @@
 export const PASSWORD_SALT_ROUNDS = 6;
+
+export const USERS_CACHE_KEYS = {
+  TEST_USERS_CACHING: 'TEST_USERS_CACHING',
+};

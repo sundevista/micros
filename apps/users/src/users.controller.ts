@@ -3,11 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Patch,
   Post,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { CacheKey } from '@nestjs/cache-manager';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
@@ -15,12 +17,27 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
 import { CurrentUser } from './auth/current-user.decorator';
-import { JwtAuthGuard, ProxySafeThrottlerGuard } from '@app/common';
+import {
+  HttpCacheInterceptor,
+  JwtAuthGuard,
+  ProxySafeThrottlerGuard,
+} from '@app/common';
 import MongooseClassSerializerInterceptor from './interceptors/mongoose-class-serializer.interceptor';
+import { USERS_CACHE_KEYS } from './users.constants';
 
 @Controller('users')
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
+
   constructor(private readonly usersService: UsersService) {}
+
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheKey(USERS_CACHE_KEYS.TEST_USERS_CACHING)
+  @Get('test-cache')
+  async testCache(): Promise<number> {
+    this.logger.log('Uncached version user');
+    return this.usersService.testUserCaching();
+  }
 
   @UseGuards(ProxySafeThrottlerGuard)
   @UseInterceptors(MongooseClassSerializerInterceptor(User))

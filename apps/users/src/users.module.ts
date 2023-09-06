@@ -17,6 +17,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import { EncryptionModule } from '@app/common/encryption/encryption.module';
 import { EncryptionService } from '@app/common/encryption/encryption.service';
 import { AuthModule } from './auth/auth.module';
+import { HttpCacheModule } from '../../../libs/common/src/http-cache/http-cache.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AuthModule } from './auth/auth.module';
     forwardRef(() => AuthModule),
     SharedAuthModule,
     RateLimiterModule,
+    HttpCacheModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository, EncryptionService],

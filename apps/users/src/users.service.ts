@@ -10,13 +10,14 @@ import { UsersRepository } from './users.repository';
 import { User } from './schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { PASSWORD_SALT_ROUNDS } from './users.constants';
+import { PASSWORD_SALT_ROUNDS, USERS_CACHE_KEYS } from './users.constants';
 import { EncryptionService } from '@app/common/encryption/encryption.service';
 import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, of, tap } from 'rxjs';
 import { mailClientKey, send_forgot_mail } from '../../../libs/common/src';
+import { HttpCacheService } from '../../../libs/common/src/http-cache/http-cache.service';
 
 @Injectable()
 export class UsersService {
@@ -27,7 +28,16 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     private readonly encryptionService: EncryptionService,
     @Inject(mailClientKey) private readonly mailClient: ClientProxy,
+    private readonly httpCacheService: HttpCacheService,
   ) {}
+
+  async clearCache(): Promise<void> {
+    await this.httpCacheService.clearCache(Object.values(USERS_CACHE_KEYS));
+  }
+
+  async testUserCaching(): Promise<number> {
+    return (await this.usersRepository.find({})).length;
+  }
 
   async hashedPassword(password: string): Promise<string> {
     return bcrypt.hash(password, PASSWORD_SALT_ROUNDS);
@@ -46,6 +56,7 @@ export class UsersService {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await this.hashedPassword(createUserDto.password);
     await this.encryptSensitiveData(createUserDto as User);
+    await this.clearCache();
 
     return this.usersRepository.create({
       ...createUserDto,
@@ -72,6 +83,7 @@ export class UsersService {
 
   async delete(id: string): Promise<void> {
     await this.usersRepository.delete({ _id: id });
+    await this.clearCache();
   }
 
   async forgotPassword(forgotPasswordRequestDto: ForgotPasswordRequestDto) {
