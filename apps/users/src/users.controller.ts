@@ -9,7 +9,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { CacheKey } from '@nestjs/cache-manager';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './schemas/user.schema';
@@ -17,13 +16,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
 import { CurrentUser } from './auth/decorators/current-user.decorator';
-import {
-  HttpCacheInterceptor,
-  SharedJwtAuthGuard,
-  ProxySafeThrottlerGuard,
-} from '@app/common';
+import { SharedJwtAuthGuard, ProxySafeThrottlerGuard } from '@app/common';
 import MongooseClassSerializerInterceptor from './interceptors/mongoose-class-serializer.interceptor';
-import { USERS_CACHE_KEYS } from './users.constants';
 
 @Controller('users')
 export class UsersController {
@@ -31,13 +25,14 @@ export class UsersController {
 
   constructor(private readonly usersService: UsersService) {}
 
-  @UseInterceptors(HttpCacheInterceptor)
-  @CacheKey(USERS_CACHE_KEYS.TEST_USERS_CACHING)
-  @Get('test-cache')
-  async testCache(): Promise<number> {
-    this.logger.log('Uncached version user');
-    return this.usersService.testUserCaching();
-  }
+  // Used only in test purposes for cache testing
+  // @UseInterceptors(HttpCacheInterceptor)
+  // @CacheKey(USERS_CACHE_KEYS.TEST_USERS_CACHING)
+  // @Get('test-cache')
+  // async testCache(): Promise<number> {
+  //   this.logger.log('Uncached version user');
+  //   return this.usersService.testUserCaching();
+  // }
 
   @UseGuards(ProxySafeThrottlerGuard)
   @UseInterceptors(MongooseClassSerializerInterceptor(User))
