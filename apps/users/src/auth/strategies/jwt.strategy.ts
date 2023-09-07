@@ -5,6 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { TokenPayload } from '../auth.service';
 import { UsersService } from '../../users.service';
 import { authenticationCookieKey } from '@app/common';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -26,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     try {
       return await this.usersService.findOneById(userId);
     } catch (err) {
-      throw new UnauthorizedException();
+      throw new RpcException(new UnauthorizedException());
     }
   }
 }
