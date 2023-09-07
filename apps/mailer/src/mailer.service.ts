@@ -18,6 +18,7 @@ export class MailerService {
       },
     });
 
+    // Checks if tranport works properly
     this.nodemailerTransport.verify((error, success) => {
       if (error) {
         this.logger.error(

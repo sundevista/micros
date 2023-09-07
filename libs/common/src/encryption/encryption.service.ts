@@ -21,6 +21,12 @@ export class EncryptionService {
     .digest('hex')
     .substring(0, 16);
 
+  /**
+   * Used to encrypt data
+   *
+   * @param data plain data
+   * @returns encrypted data
+   */
   encryptData(data: string): string {
     const cipher = createCipheriv(this.alg, this.key, this.iv);
     return Buffer.from(
@@ -28,6 +34,12 @@ export class EncryptionService {
     ).toString('base64');
   }
 
+  /**
+   * Used to decrypt data
+   *
+   * @param data encrypted data
+   * @returns decrypted (plain) data
+   */
   decryptData(data: string): string {
     const buff = Buffer.from(data, 'base64');
     const decipher = createDecipheriv(this.alg, this.key, this.iv);
@@ -37,6 +49,12 @@ export class EncryptionService {
     );
   }
 
+  /**
+   * Used to generate random token
+   *
+   * @param length size of the token
+   * @returns random token
+   */
   generateToken(length: number = 64): string {
     if (length < 2) return '';
     return randomBytes(Math.round(length / 2)).toString('hex');

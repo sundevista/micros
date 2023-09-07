@@ -16,10 +16,10 @@ import { User } from './schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
-import { CurrentUser } from './auth/current-user.decorator';
+import { CurrentUser } from './auth/decorators/current-user.decorator';
 import {
   HttpCacheInterceptor,
-  JwtAuthGuard,
+  SharedJwtAuthGuard,
   ProxySafeThrottlerGuard,
 } from '@app/common';
 import MongooseClassSerializerInterceptor from './interceptors/mongoose-class-serializer.interceptor';
@@ -46,7 +46,7 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
-  @UseGuards(ProxySafeThrottlerGuard, JwtAuthGuard)
+  @UseGuards(ProxySafeThrottlerGuard, SharedJwtAuthGuard)
   @UseInterceptors(MongooseClassSerializerInterceptor(User))
   @Get()
   async findUser(@CurrentUser() user: User): Promise<User> {
@@ -54,7 +54,7 @@ export class UsersController {
   }
 
   @UseInterceptors(MongooseClassSerializerInterceptor(User))
-  @UseGuards(ProxySafeThrottlerGuard, JwtAuthGuard)
+  @UseGuards(ProxySafeThrottlerGuard, SharedJwtAuthGuard)
   @Patch()
   async updateUser(
     @CurrentUser() user: User,
@@ -63,7 +63,7 @@ export class UsersController {
     return this.usersService.update(user._id.toString(), updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SharedJwtAuthGuard)
   @Delete()
   async delete(@CurrentUser() user: User): Promise<void> {
     return this.usersService.delete(user._id.toString());

@@ -27,6 +27,9 @@ export class User extends AbstractDocument {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+/**
+ * Array of encrypted (by {@link Encrypt} decorator) keys
+ */
 export const encryptedUserFields = (() => {
   const fakeEntity = new User();
 

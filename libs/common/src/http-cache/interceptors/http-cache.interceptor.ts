@@ -1,6 +1,9 @@
 import { CacheInterceptor, CACHE_KEY_METADATA } from '@nestjs/cache-manager';
 import { Injectable, ExecutionContext } from '@nestjs/common';
 
+/**
+ * Used to modify default cache key (adds request's query)
+ */
 @Injectable()
 export class HttpCacheInterceptor extends CacheInterceptor {
   trackBy(context: ExecutionContext): string | undefined {

@@ -21,6 +21,8 @@ import { HttpCacheService } from '@app/common';
 
 @Injectable()
 export class UsersService {
+  // Store for user restoration tokens
+  //  (should be changed in case of multiple api instances (to share single state))
   private readonly passwordRestoration: Record<string, string> = {};
   private readonly logger = new Logger(UsersService.name);
 
@@ -31,18 +33,37 @@ export class UsersService {
     private readonly httpCacheService: HttpCacheService,
   ) {}
 
+  /**
+   * Clear http cache
+   */
   async clearCache(): Promise<void> {
     await this.httpCacheService.clearCache(Object.values(USERS_CACHE_KEYS));
   }
 
+  /**
+   * Testing function to check caching
+   *
+   * @returns number of registered users
+   */
   async testUserCaching(): Promise<number> {
     return (await this.usersRepository.find({})).length;
   }
 
+  /**
+   * Salts password with bcrypt
+   *
+   * @param password plain password
+   * @returns hashed password
+   */
   async hashedPassword(password: string): Promise<string> {
     return bcrypt.hash(password, PASSWORD_SALT_ROUNDS);
   }
 
+  /**
+   * Encrypts objects properties those are marked with {@link Encrypt} decorator
+   *
+   * @param user object to modify
+   */
   async encryptSensitiveData(user: User) {
     encryptedUserFields.forEach((field) => {
       if (user[field])
@@ -50,6 +71,11 @@ export class UsersService {
     });
   }
 
+  /**
+   * Decrypts objects properties those are marked with {@link Encrypt} decorator
+   *
+   * @param user object to modify
+   */
   async decryptSensitiveData(user: User) {
     encryptedUserFields.forEach((field) => {
       if (user[field])
@@ -99,9 +125,11 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
+    // Create restoration token and save it in services memory
     const token = this.encryptionService.generateToken();
     this.passwordRestoration[token] = user._id.toString();
 
+    // Send a mail using microservice
     return this.mailClient
       .send(send_forgot_mail, { recepient: user.email, token })
       .pipe(
@@ -120,6 +148,9 @@ export class UsersService {
       );
   }
 
+  /**
+   * Used to reset password from given token
+   */
   async resetPassword(requestPasswordResetDto: RequestPasswordResetDto) {
     if (this.passwordRestoration[requestPasswordResetDto.token]) {
       const user = await this.findOneById(
@@ -132,7 +163,14 @@ export class UsersService {
     }
   }
 
-  async validateUser(email: string, password: string) {
+  /**
+   * Validates user credentials
+   *
+   * @param email user email
+   * @param password user plain password
+   * @returns user
+   */
+  async validateUser(email: string, password: string): Promise<User> {
     const user = await this.usersRepository.findOne({ email });
     const passwordsMatch = bcrypt.compare(password, user.password);
 
