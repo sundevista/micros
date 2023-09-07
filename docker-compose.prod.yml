@@ -1,20 +1,45 @@
+version: '3.9'
+name: micros-production
+
 services:
-  users:
+  users-microservice:
+    container_name: users-microservice
     build:
       context: .
       dockerfile: ./apps/users/Dockerfile
-      target: development
-    command: npm run start:dev users
+      target: production
     env_file: ./apps/users/.env
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://root:${MONGODB_ROOT_PASSWORD}@mongodb-primary:27017/?directConnection=true&authMechanism=DEFAULT
+      - RABBIT_MQ_URI=amqp://rabbitmq:5672
     depends_on:
       - mongodb-primary
       - mongodb-secondary
       - mongodb-arbiter
+      - rabbitmq
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - '3000:3000'
+      - '3002:3000'
+  mailer-microservice:
+    container_name: mailer-microservice
+    build:
+      context: .
+      dockerfile: ./apps/mailer/Dockerfile
+      target: production
+    env_file: ./apps/mailer/.env
+    environment:
+      - PORT=3001
+      - RABBIT_MQ_URI=amqp://rabbitmq:5672
+    depends_on:
+      - users-microservice
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3003:3001'
   mongodb-primary:
     image: docker.io/bitnami/mongodb:5.0
     environment:
@@ -25,7 +50,7 @@ services:
     volumes:
       - 'mongodb_master_data:/bitnami/mongodb'
     ports:
-      - '27017:27017'
+      - '27018:27017'
   mongodb-secondary:
     image: docker.io/bitnami/mongodb:5.0
     depends_on:
@@ -47,10 +72,9 @@ services:
       - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=$MONGODB_ROOT_PASSWORD
       - MONGODB_REPLICA_SET_KEY=$MONGODB_REPLICA_SET_KEY
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:3
     ports:
-      - '5672:5672'
-      - '15671:15672'
+      - '5673:5672'
 
 volumes:
   mongodb_master_data:
