@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MailerService } from './mailer.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { send_forgot_mail } from '../../../libs/common/src';
+import { send_forgot_mail } from '@app/common';
 import { SendForgotMailDto } from './dto/send-forgot-mail.dto';
 
 @Controller()

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { User } from '../schemas/user.schema';
-import { authenticationCookieKey } from '../../../../libs/common/src';
+import { authenticationCookieKey } from '@app/common';
 
 export interface TokenPayload {
   userId: string;

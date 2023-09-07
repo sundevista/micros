@@ -3,7 +3,7 @@ import { MailerController } from './mailer.controller';
 import { MailerService } from './mailer.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { RmqModule } from '../../../libs/common/src';
+import { RmqModule } from '@app/common';
 
 @Module({
   imports: [

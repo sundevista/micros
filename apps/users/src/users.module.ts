@@ -17,7 +17,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import { EncryptionModule } from '@app/common/encryption/encryption.module';
 import { EncryptionService } from '@app/common/encryption/encryption.service';
 import { AuthModule } from './auth/auth.module';
-import { HttpCacheModule } from '../../../libs/common/src/http-cache/http-cache.module';
+import { HttpCacheModule } from '@app/common';
 
 @Module({
   imports: [

@@ -6,7 +6,7 @@ import { CurrentUser } from './current-user.decorator';
 import JwtAuthGuard from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { User } from '../schemas/user.schema';
-import { validate_user } from '../../../../libs/common/src';
+import { validate_user } from '@app/common';
 
 @Controller('auth')
 export class AuthController {
