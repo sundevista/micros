@@ -38,6 +38,7 @@ export class EncryptionService {
   }
 
   generateToken(length: number = 64): string {
-    return randomBytes(length).toString('hex');
+    if (length < 2) return '';
+    return randomBytes(Math.round(length / 2)).toString('hex');
   }
 }
