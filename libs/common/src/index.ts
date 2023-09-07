@@ -3,6 +3,7 @@ export * from './databases/abstract.repository';
 export * from './databases/abstract.schema';
 export * from './encryption/encryption.module';
 export * from './encryption/encryption.service';
+export * from './encryption/decorators/encrypted.decorator';
 export * from './rmq/rmq.module';
 export * from './rmq/rmq.service';
 export * from './rmq/rmq.constants';

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AbstractDocument } from '@app/common';
+import { AbstractDocument, Encrypt, encryptMetadataKey } from '@app/common';
 import { Exclude } from 'class-transformer';
 
 @Schema({ versionKey: false })
@@ -20,6 +20,17 @@ export class User extends AbstractDocument {
   @Exclude()
   @Prop()
   partnerKey: string;
+
+  @Encrypt()
+  @Prop({ default: 'xxx' })
+  key?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+export const encryptedUserFields = (() => {
+  const fakeEntity = new User();
+
+  return Object.keys(UserSchema.obj).filter((key) =>
+    Reflect.getMetadata(encryptMetadataKey, fakeEntity, key),
+  );
+})();

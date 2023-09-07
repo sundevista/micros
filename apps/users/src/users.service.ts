@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRepository } from './users.repository';
-import { User } from './schemas/user.schema';
+import { User, encryptedUserFields } from './schemas/user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { PASSWORD_SALT_ROUNDS, USERS_CACHE_KEYS } from './users.constants';
@@ -16,8 +16,8 @@ import { ForgotPasswordRequestDto } from './dto/forgot-password-request.dto';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, of, tap } from 'rxjs';
-import { mailClientKey, send_forgot_mail } from '../../../libs/common/src';
-import { HttpCacheService } from '../../../libs/common/src/http-cache/http-cache.service';
+import { mailClientKey, send_forgot_mail } from '@app/common';
+import { HttpCacheService } from '@app/common';
 
 @Injectable()
 export class UsersService {
@@ -44,13 +44,17 @@ export class UsersService {
   }
 
   async encryptSensitiveData(user: User) {
-    if (user.partnerKey)
-      user.partnerKey = this.encryptionService.encryptData(user.partnerKey);
+    encryptedUserFields.forEach((field) => {
+      if (user[field])
+        user[field] = this.encryptionService.encryptData(user.partnerKey);
+    });
   }
 
   async decryptSensitiveData(user: User) {
-    if (user.partnerKey)
-      user.partnerKey = this.encryptionService.decryptData(user.partnerKey);
+    encryptedUserFields.forEach((field) => {
+      if (user[field])
+        user[field] = this.encryptionService.decryptData(user.partnerKey);
+    });
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
