@@ -1,73 +1,33 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# micros
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Project's built using microservices architecture (with RabbitMQ communication). Currently, the application has 2 microservices: users and mailer.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Users takes care of full-fledged user CRUD and authentication process. Auth based on passport and JWT tokens, those are stored in secured http-only cookie. User can login, logout, register, update its data, and deletes itself.
 
-## Description
+Users module uses hand-made encryption service to encrypt and decrypt data. Special @Encrypt decorator is used to mark sensitive fields for encryptSensitiveData() and decryptSensitiveData() functions.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Mailer takes care of sending reset password mails to users. It receives requests from users service and then does its work.
 
-## Installation
+> WARNING: Be careful using gmail as mailing service, bacause it marks its mails as spam.
 
-```bash
-$ yarn install
-```
+## Running
 
-## Running the app
+Each approach needs `.env` to be configured. Application has main `.env` file in root source directory. Also, each microservice has its own `.env` specific for its needs.
 
-```bash
-# development
-$ yarn run start
+Each `.env` file has its sample named as `.env.sample`. These files contain all necessary environment variables. But if you forget to add some of them, the application will tell you, because of the Joi validation.
 
-# watch mode
-$ yarn run start:dev
+### All self-hosted
 
-# production mode
-$ yarn run start:prod
-```
+If you have all self-hosted (RabbitMQ, MongoDB replica set) you can use:
 
-## Test
+- `npm run start:all:dev` for development
+- `npm run start:all:prod` for production
 
-```bash
-# unit tests
-$ yarn run test
+### Docker
 
-# e2e tests
-$ yarn run test:e2e
+Both production and development environments can be used with docker:
 
-# test coverage
-$ yarn run test:cov
-```
+- `npm run start:docker:dev` for development (will use ports defined in `.env`s)
+- `npm run start:docker:prod` for production (will use 3002 for users and 3003 for mailer by default)
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Ports in production docker-compose file are hard-coded to make possible to run both docker environments in the same time.
