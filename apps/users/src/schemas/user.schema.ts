@@ -4,23 +4,23 @@ import { Exclude } from 'class-transformer';
 
 @Schema({ versionKey: false })
 export class User extends AbstractDocument {
-  @Prop()
+  @Prop({ required: true })
   firstName: string;
 
-  @Prop()
+  @Prop({ required: true })
   lastName: string;
 
-  @Prop({ unique: true, index: true })
+  @Prop({ required: true, unique: true, index: true })
   email: string;
 
   @Exclude()
-  @Prop()
+  @Prop({ required: true })
   password: string;
 
   @Encrypt()
   @Exclude()
-  @Prop()
-  partnerKey?: string = '';
+  @Prop({ required: false })
+  partnerKey?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
