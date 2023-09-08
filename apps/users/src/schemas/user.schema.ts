@@ -20,7 +20,7 @@ export class User extends AbstractDocument {
   @Encrypt()
   @Exclude()
   @Prop()
-  partnerKey: string;
+  partnerKey?: string = '';
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

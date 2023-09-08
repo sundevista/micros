@@ -1,6 +1,7 @@
 import {
   IsDefined,
   IsEmail,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -25,8 +26,9 @@ export class CreateUserDto {
   @MaxLength(128)
   password: string;
 
+  @IsOptional()
   @IsString()
   @MinLength(8)
   @MaxLength(128)
-  partnerKey: string;
+  partnerKey?: string;
 }
