@@ -171,7 +171,12 @@ export class UsersService {
    * @returns user
    */
   async validateUser(email: string, password: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ email });
+    let user: User;
+    try {
+      user = await this.usersRepository.findOne({ email });
+    } catch (err) {
+      throw new UnauthorizedException();
+    }
     const passwordsMatch = bcrypt.compare(password, user.password);
 
     if (!passwordsMatch) {
