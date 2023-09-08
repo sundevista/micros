@@ -14,7 +14,7 @@
     "start:prod": "node dist/apps/micros/main",
     "start:all:prod": "npm run build && concurrently \"node dist/apps/users/main.js\" \"node dist/apps/mailer/main.js\"",
     "start:all:dev": "concurrently \"npm run start:dev users\" \"npm run start:dev mailer\"",
-    "start:docker:prod": "docker compose -f docker-compose.prod.yml up --build -V -d",
+    "start:docker:prod": "docker compose -f docker-compose.prod.yml up --build --force-recreate -V -d",
     "start:docker:dev": "docker compose -f docker-compose.dev.yml up -d && npm run start:all:dev",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
